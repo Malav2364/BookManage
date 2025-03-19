@@ -9,15 +9,25 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@graphql-tools/schema": "^10.0.23",
+    "@prisma/client": "^6.5.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "graphql-yoga": "^5.13.2",
+    "lucide-react": "^0.483.0",
+    "next": "15.2.3",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.2.3"
+    "tailwind-merge": "^3.0.2",
+    "tw-animate-css": "^1.2.4"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
-    "@eslint/eslintrc": "^3"
+    "prisma": "^6.5.0",
+    "tailwindcss": "^4"
   }
 }
