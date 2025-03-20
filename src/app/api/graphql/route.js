@@ -2,6 +2,7 @@ import { createYoga, createSchema } from "graphql-yoga";
 import { PrismaClient } from "@prisma/client";
 import redis from "@/lib/redis"; // Hosted Redis server connection
 import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
 
 const prisma = new PrismaClient();
 
@@ -43,11 +44,17 @@ const typeDefs = `
         user(id: ID!): User
     }
 
+    type authPayload{
+        token : String!
+        user : User!
+    }
+
     type Mutation {
         addBook(title: String!, authorId: ID!, publishedAt: String!, genre: String): Book!
         deleteBook(id: ID!): Boolean!
         addUser(email: String!, username: String!, password : String!, role : Role): User!
         deleteUser(id:ID!): Boolean!
+        login(email: String!, password : String!) : authPayload!
     }
 `;
 
@@ -105,12 +112,24 @@ const resolvers = {
             return  newUser;
         },
         deleteUser : async (_,{id})=>{
-            await prisma.user.delete({
-                where : {id}
-            });
+            await prisma.user.delete({where : {id}});
             await redis.del('users');
             return true;
-        }
+        },
+        login : async (_, {email, password})=>{
+            const user = await prisma.user.findUnique({where  : {email}});
+            if (!user) throw new Error("User not Found")
+            
+            const valid = await bcrypt.compare(password, user.password);
+            if(!valid) throw new Error("Invalid Credentials!!")
+            
+                const token = jwt.sign(
+                    {userId: user.id, role : user.role},
+                    process.env.JWT_SECRET,
+                    {expiresIn: "7d"}
+                );
+                return {token, user};
+        },
     },
 };
 
